@@ -3,15 +3,42 @@
     <head>
         <meta charset="utf-8">
         <link href="style.css" rel="stylesheet">
-        <title>Wordle</title>
+        <title></title>
         <script src="https://telegram.org/js/telegram-web-app.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     </head>
     
     <body>
-
-        <header>wordlenail</header>
-
+        <audio id = "idAudio">
+            <source src = "music.mp3" type = "audio/ogg" >
+            <source src = "music.mp3" type ="audio/mpeg">The browser is not supporting the audio element...
+        </audio>
+        <button id="playButton" onclick="toggleAudio()">
+            <img id="audioImage" src="image_paused.png" alt="Paused">
+        </button> 
+        <div id="background-container">
+            <img id="background-image" src="fon.jpg" alt="Background image">
+        </div>
         
+        <header></header>
+        <div class="top-currency"> 
+            <img src="coin.png" alt="Валюта" id="currency-image">
+            <span id="currency-count">0</span> </div>
+        <div class="gif-container">
+                <img src="anim.gif" alt="Анимация">
+        </div>
+        <div class="top-left">
+                <button onclick="window.location.href='rating.html'">
+                <img src="rating.png" alt="Кубок" id="cup-image">
+                <span>Рейтинг</span> 
+            </button>
+        </div>
+        <div class="top-right">
+            <button onclick="window.location.href='Shop.html'">
+            <img src="shop.png" alt="Магазин" id="shop-image">
+            <span>Магазин</span> 
+        </button>
+    </div>
 
         <div>
             <table>
@@ -60,9 +87,48 @@
             </table>
         </div>
         <div>
-            <p id="total-words-count-label"></p>
+            <p id="total-words-count-label" class="words"></p>
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <p id="modalMessage"></p>
+                <button id="newGameButton">Начать новую игру</button>
+            </div>
         </div>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="script.js"></script>
+        <script>
+            var a = document.getElementById("idAudio");
+            var image = document.getElementById("audioImage"); 
+            var isPlaying = false;
+        
+            // Устанавливаем начальное изображение
+            image.src = "music_on.png"; // Измените на ваше изображение "Пауза"
+        
+            function toggleAudio() {
+                if (isPlaying) {
+                    a.pause();
+                    isPlaying = false;
+                    image.src = "music_on.png"; // Измените на ваше изображение "Пауза"
+                } else {
+                    a.play();
+                    isPlaying = true;
+                    image.src = "music_off.png"; // Измените на ваше изображение "Воспроизведение"
+                }
+            }
+        </script>
+        <script>
+            $(document).ready(() => {
+            // Получаем выбранный скин из localStorage
+            const selectedSkin = localStorage.getItem('selectedSkin');
+            if (selectedSkin) {
+                $('.gif-container img').attr('src', selectedSkin); // Обновляем изображение скина
+            }
+
+            // Получаем валюту из localStorage
+            const currency = parseInt(localStorage.getItem('currency')) || 0;
+            $('#currency-count').text(currency); // Обновляем отображение валюты
+            });
+
+        </script>
     </body>
 </html>
