@@ -1,40 +1,267 @@
+let currency = 0; // Переместите эту строку сюда, чтобы она была доступна глобально
+let userId; // Объявляем переменную userId в глобальной области видимости
+let skinId; // Объявляем переменную skinId в глобальной области видимости
+let currentSlot = 0; // Текущий слот
+let lastClaimTime = 0; // Время последнего получения награды
+const prizeInterval = 30000; // Интервал в 30 секунд
+const totalSlots = 7; // Общее количество слотов
+let claimedRewards = []; // Массив для хранения состояния наград
+
+// Загружаем состояние наград из localStorage при инициализации
 $(document).ready(() => {
+  const userId = localStorage.getItem('userId');
+  if (!userId || !isUserInDatabase(userId)) { // Предполагается, что у вас есть функция isUserInDatabase
+        localStorage.clear();
+  }
+  currency = parseInt(localStorage.getItem('currency')) || 2000; // Получаем валюту из localStorage или устанавливаем 2000
+  claimedRewards = JSON.parse(localStorage.getItem('claimedRewards')) || Array(totalSlots).fill(false); // Загружаем состояние наград
+  lastClaimTime = parseInt(localStorage.getItem('lastClaimTime')) || 0; // Загружаем время последнего получения
+  updateCurrency(); // Обновляем отображение валюты
+  updateTimer(); // Обновляем таймер при загрузке
+});
+
+// Функция для открытия модального окна
+function openPrizeModal() {
+    $('#slots').empty(); // Очищаем слоты
+    for (let i = 0; i < totalSlots; i++) {
+        const isClaimed = claimedRewards[i] || false; // Проверяем, была ли награда забрана
+        const isActive = i === currentSlot && !isClaimed; // Награда активна только если она не забрана и это текущий слот
+        $('#slots').append(`<button class="slot-button" data-slot="${i}" ${isClaimed ? 'disabled' : (isActive ? '' : 'disabled')}>Слот ${i + 1} ${isClaimed ? '(Забрано)' : ''}</button>`);
+    }
+    $('#prizeModal').show();
+    updateTimer();
+}
+
+// Обработчик для кнопки "Приз"
+$('#prizeButton').click(function() {
+    openPrizeModal(); // Открываем модальное окно
+});
+
+// Обработчик для кнопок слотов
+$(document).on('click', '.slot-button', function() {
+  const slot = $(this).data('slot');
+  if (slot === currentSlot) {
+      // Логика для начисления валюты
+      currency += 100; // Пример начисления 100 валюты
+      updateCurrency(); // Обновляем отображение валюты
+      lastClaimTime = Date.now(); // Обновляем время последнего получения
+      localStorage.setItem('lastClaimTime', lastClaimTime); // Сохраняем время в localStorage
+
+      // Обновляем состояние награды
+      claimedRewards[slot] = true; // Помечаем награду как забранную
+      localStorage.setItem('claimedRewards', JSON.stringify(claimedRewards)); // Сохраняем в localStorage
+
+      // Отправляем запрос на обновление награды
+      const userId = localStorage.getItem('userId'); // Получаем ID пользователя
+      $.get('update_reward.php', { userId: userId, money: 100, slot: slot + 1 })
+          .done(function(response) {
+              console.log('Ответ сервера:', response);
+              try {
+                  const data = JSON.parse(response);
+                  if (data.status === 'success') {
+                      console.log(data.message);
+                      lastClaimTime = data.rewardTime; // Устанавливаем время последнего получения
+                      updateTimer(); // Обновляем таймер
+                  } else {
+                      console.error(data.message);
+                  }
+              } catch (e) {
+                  console.error('Ошибка при парсинге JSON:', e);
+              }
+          })
+          .fail(function(jqXHR, textStatus, errorThrown) {
+              console.error('Ошибка при отправке запроса на сервер:', textStatus, errorThrown);
+          });
+
+      // Деактивируем все кнопки и запускаем таймер
+      $('.slot-button').attr('disabled', true);
+      $(this).text('Забрано').attr('disabled', true); // Деактивируем текущую кнопку
+
+      // Запускаем таймер на 30 секунд
+      setTimeout(() => {
+          currentSlot = (currentSlot + 1) % totalSlots; // Переходим к следующему слоту
+          $('.slot-button').attr('disabled', true); // Деактивируем все кнопки
+          // Активируем следующую кнопку, если она не была забрана
+          if (!claimedRewards[currentSlot]) {
+              $(`.slot-button[data-slot="${currentSlot}"]`).attr('disabled', false); // Активируем следующую кнопку
+          }
+          updateTimer(); // Обновляем таймер
+      }, prizeInterval);
+  } else {
+      console.log('Сначала заберите предыдущую награду!');
+  }
+});
+
+// Функция для обновления таймера
+function updateTimer() {
+  const now = Date.now();
+  const timePassed = now - lastClaimTime * 1000; // Учитываем, что lastClaimTime в секундах
+  const timeLeft = prizeInterval - timePassed;
+
+  if (timeLeft > 0) {
+      const secondsLeft = Math.ceil(timeLeft / 1000);
+      $('#timer').text(`Следующая награда через: ${secondsLeft} секунд`);
+  } else {
+      $('#timer').text('Вы можете получить награду!');
+  }
+}
+
+// Обновление таймера каждую секунду
+setInterval(updateTimer, 1000);
+
+// Обработчик для закрытия модального окна
+$('#closeModal').click(function() {
+    $('#prizeModal').hide();
+});
+
+// Функция обновления валюты
+function updateCurrency() {
+    $('#currency-count').text(currency);
+    localStorage.setItem('currency', currency);
+}
+
+// Обновите функцию updateCharacterSkin
+function updateCharacterSkin(skin) {
+    localStorage.setItem('selectedSkin', skin);
+    $('#character-container img').attr('src', skin); // Обновляем изображение персонажа
+}
+
+// Обновите обработчик события для кнопки "Купить"
+$('.buy-button').click(function() {
+    const itemPrice = parseInt($(this).closest('.item').find('.price').text());
+    const itemGif = $(this).closest('.item').find('.gid-image').attr('src');
+    skinId = $(this).data('skin-id'); // Присваиваем значение skinId
+
+    // Получаем валюту из localStorage
+    let currency = parseInt(localStorage.getItem('currency')) || 0;
+
+    // Получаем ID пользователя из localStorage
+    userId = localStorage.getItem('userId'); // Извлекаем userId
+
+    // Проверка на наличие купленного скина
+    let purchasedSkins = JSON.parse(localStorage.getItem('purchasedSkins')) || {};
+    if (purchasedSkins[skinId]) {
+        console.log('Вы уже купили этот скин!');
+        return; 
+    }
+
+    if (currency >= itemPrice) {
+        currency -= itemPrice; 
+        localStorage.setItem('currency', currency); 
+        $('#currency-count').text(currency); 
+
+        purchasedSkins[skinId] = true; // Помечаем скин как купленный
+        localStorage.setItem('purchasedSkins', JSON.stringify(purchasedSkins));
+
+        // Обновляем скин персонажа
+        updateCharacterSkin(itemGif); 
+
+        // Обновляем состояние кнопки
+        $(this).text('Куплено').attr('disabled', true); 
+
+        console.log('Скин куплен!'); 
+        if (userId && skinId) { 
+            $.get('add_skin.php', { id: userId, skinId: skinId })
+            .done(function(data) {
+                console.log('Ответ от сервера:', data); 
+                try {
+                    const response = typeof data === 'string' ? JSON.parse(data) : data; 
+                    if (response.status === 'success') {
+                        console.log(response.message); 
+                    } else {
+                        console.error('Ошибка при добавлении скина:', response.message || 'Неизвестная ошибка');
+                    }
+                } catch (e) {
+                    console.error('Ошибка при обработке ответа:', e);
+                }
+            })
+            .fail(function(jqXHR, textStatus, errorThrown) {
+                console.error('Ошибка при запросе:', textStatus, errorThrown);
+            });
+        } else {
+            console.error('ID пользователя или skinId не определены.');
+        }
+    } else {
+        console.log('Недостаточно валюты для покупки!'); 
+    }
+});
+
+
+$(document).ready(() => {
+  localStorage.removeItem('purchasedSkins');
+  localStorage.removeItem('currency'); // Если нужно
   const wordList = ['frank', 'fraud', 'freak', 'freed', 'freer', 'fresh', 'friar', 'fried', 'frill', 'frisk', 'fritz', 'frock', 'frond', 'front', 'frost', 'froth'];
   let word = 'Hello';
-  let correctWords = 0; // Счетчик угаданных слов за все игры
-  let attempts = 0; // Счетчик попыток 
+  let correctWords = 0; 
+  let attempts = 0; 
   let gameCompleted = false;
-  let currency = 2000;
   const tg = window.Telegram.WebApp;
-  function updateCurrency() {
-    $('#currency-count').text(currency);
-    localStorage.setItem('currency', currency); // Сохраняем валюту в localStorage
-  }
-  // Функция обновления скина персонажа
-  function updateCharacterSkin() {
-    // Получаем информацию о выбранном скине из localStorage
-    let selectedSkin = localStorage.getItem('selectedSkin');
-    // Получаем информацию о купленных скинах из localStorage
-    let purchasedSkins = JSON.parse(localStorage.getItem('purchasedSkins')) || {};
-    if (selectedSkin && purchasedSkins[selectedSkin]) {
-      $('#character-container img').attr('src', selectedSkin);
-    } else {
-      // Используйте стандартный скин, если скин не куплен
-      $('#character-container img').attr('src', 'default_character.gif'); 
+  function updateCharacterSkinFromLocalStorage() {
+    const selectedSkin = localStorage.getItem('selectedSkin');
+    if (selectedSkin) {
+        $('#character-container img').attr('src', selectedSkin); 
     }
   }
-  // Получите информацию о выбранном скине из localStorage
-  let selectedSkin = localStorage.getItem('selectedSkin');
-  if (selectedSkin) {
-    updateCharacterSkin(selectedSkin);
-  }
   
+  $(document).ready(() => {
+    localStorage.removeItem('purchasedSkins');
+    localStorage.removeItem('currency');
+    if (!localStorage.getItem('purchasedSkins')) {
+        localStorage.setItem('purchasedSkins', JSON.stringify({}));
+    }
+
+    
+    $.get('add_skin.php', { id: userId, skinId: skinId })
+    .done(function(data) {
+        console.log('Ответ от сервера:', data); 
+        try {
+            const response = typeof data === 'string' ? JSON.parse(data) : data;
+            if (response.status === 'success') {
+                console.log(response.message);
+            } else {
+                console.error('Ошибка при добавлении скина:', response.message || 'Неизвестная ошибка');
+            }
+        } catch (e) {
+            console.error('Ошибка при обработке ответа:', e);
+        }
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+        console.error('Ошибка при запросе:', textStatus, errorThrown);
+        console.error('Ответ сервера:', jqXHR.responseText); 
+    });
+
+    // Получаем купленные скины из localStorage
+    let purchasedSkins = JSON.parse(localStorage.getItem('purchasedSkins')) || {};
+    $('.item').each(function() {
+        const skinId = $(this).find('.buy-button').data('skin-id');
+        if (purchasedSkins[skinId]) {
+            $(this).find('.buy-button').text('Куплено').attr('disabled', true); // Деактивируем кнопку
+        }
+    });
+
+    // Устанавливаем выбранный скин
+    const selectedSkin = localStorage.getItem('selectedSkin');
+    if (selectedSkin) {
+        $('#character-container img').attr('src', selectedSkin); 
+    }
+    
+    
+    const currency = parseInt(localStorage.getItem('currency')) || 0;
+    lastClaimTime = parseInt(localStorage.getItem('lastClaimTime')) || 0;
+    $('#currency-count').text(currency); 
+  });
+
   function getScore(id, name) {
     $.get('/score.php', { id: id, name: name }, function(data) {
         console.log(data); // Выводим все данные, полученные от сервера
-        if (data.status === 'success' && typeof data.score === 'number') {
+        if (data.status === 'success' && typeof data.score === 'number' && typeof data.money === 'number') {
             correctWords = data.score;
+            currency = data.money; 
             $('#total-words-count-label').text('Верно угаданных слов: ' + correctWords);
+            updateCurrency(); // Обновляем отображение валюты
+
+            // Сохраняем userId в localStorage
+            localStorage.setItem('userId', id);
         } else {
             console.log('Ошибка: неверный ответ от сервера', data);
         }
@@ -42,6 +269,8 @@ $(document).ready(() => {
         console.log('Ошибка при выполнении запроса.');
     });
   }
+
+
     // Функция для установки нового слова
     function setGameWord() {
       let randomNum = Math.floor(Math.random() * 16);
@@ -70,13 +299,13 @@ $(document).ready(() => {
     const tg_data = tg.initData;
     let id_tg = '';
     let name = "";
-    if (tg_data != ""){
+    // В этом месте вы уже получаете имя пользователя
+    if (tg_data != "") {
       let res = parseInitData(tg_data);
       id_tg = res.user.id;
-      getScore(id_tg,name); // Используем id_tg в функции getScore
-      console.log(res.user);
-      name = res.user.first_name+" "+res.user.last_name;
-    } 
+      name = res.user.first_name + " " + res.user.last_name; // Получаем имя пользователя
+      getScore(id_tg, name); // Передаем имя пользователя в функцию getScore
+    }
 
     // Функция обновления счетчика
     function updateWordCount() {
@@ -120,13 +349,22 @@ $(document).ready(() => {
       async function addScore(id, score) {
         console.log('Отправка на сервер: id =', id, 'score =', score); // Отладка
         try {
-            const response = await $.get('/add_score.php', { id: id, score: score });
+            const response = await $.get('/add_score.php', { id: id, score: score, name: name }); // Убедитесь, что name передается
             console.log('Ответ сервера:', response); // Отладка
-            $('#total-words-count-label').text('Score успешно добавлен.');
+            
+            if (response.status === 'success') {
+                // Обновляем значение валюты на экране
+                currency += 10; // Увеличиваем валюту на 10 за каждое угаданное слово
+                updateCurrency(); // Обновляем отображение валюты
+                $('#total-words-count-label').text('Score успешно добавлен.');
+            } else {
+                $('#total-words-count-label').text('Ошибка: ' + response.message);
+            }
         } catch (error) {
             console.log('Ошибка при выполнении запроса:', error); // Отладка
         }
-        }
+      }
+    
       // Цикл по 5 полям ввода, начиная с ⓃstartⓃ
       for (var i = start; i <= index; i++) {
         // Получаем текущий символ из слова
@@ -175,7 +413,7 @@ $(document).ready(() => {
         newGame(); // Запускаем новую игру
         // Обновляем счет на сервере
         console.log('Количество угаданных слов перед отправкой:', correctWords); // Отладка
-        await addScore(id_tg, correctWords);
+        await addScore(id_tg, 1);
         // Возвращаем количество правильных слов
         return correctWords;
       }else {
@@ -258,9 +496,14 @@ $(document).ready(() => {
     newGame();
     updateWordCount();
     updateCurrency(); // Обновляем валюту при инициализации
-    updateCharacterSkin();
+    updateCharacterSkinFromLocalStorage();
+    updateTimer();
+    
 });
-
+// Инициализация валюты
+currency = parseInt(localStorage.getItem('currency')) || 2000; // Получаем валюту из localStorage или устанавливаем 2000
+updateCurrency(); // Обновляем отображение валюты
+// Остальной код..
 // Функция задержки (для анимации)
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));

@@ -184,6 +184,8 @@ input {
     font-size: 18px; /* Размер шрифта */
     font-weight: bold; /* Жирный шрифт */
 }
+
+
 .top-right {
     position:
     fixed; /* Фиксируем позицию */

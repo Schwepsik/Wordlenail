@@ -14,7 +14,7 @@
             <source src = "music.mp3" type ="audio/mpeg">The browser is not supporting the audio element...
         </audio>
         <button id="playButton" onclick="toggleAudio()">
-            <img id="audioImage" src="image_paused.png" alt="Paused">
+            <img id="audioImage" src="music_off.png" alt="Paused">
         </button> 
         <div id="background-container">
             <img id="background-image" src="fon.jpg" alt="Background image">
@@ -24,8 +24,8 @@
         <div class="top-currency"> 
             <img src="coin.png" alt="Валюта" id="currency-image">
             <span id="currency-count">0</span> </div>
-        <div class="gif-container">
-                <img src="anim.gif" alt="Анимация">
+        <div class="gif-container" id="character-container">
+            <img src="default_character.gif" alt="Персонаж" id="character-image">
         </div>
         <div class="top-left">
                 <button onclick="window.location.href='rating.html'">
@@ -33,6 +33,8 @@
                 <span>Рейтинг</span> 
             </button>
         </div>
+        
+        
         <div class="top-right">
             <button onclick="window.location.href='Shop.html'">
             <img src="shop.png" alt="Магазин" id="shop-image">
@@ -118,17 +120,53 @@
         </script>
         <script>
             $(document).ready(() => {
-            // Получаем выбранный скин из localStorage
-            const selectedSkin = localStorage.getItem('selectedSkin');
-            if (selectedSkin) {
-                $('.gif-container img').attr('src', selectedSkin); // Обновляем изображение скина
-            }
+                // Получаем валюту из localStorage
+                const currency = parseInt(localStorage.getItem('currency')) || 2000; // Устанавливаем 2000 по умолчанию
+                $('#currency-count').text(currency); // Обновляем отображение валюты
 
-            // Получаем валюту из localStorage
-            const currency = parseInt(localStorage.getItem('currency')) || 0;
-            $('#currency-count').text(currency); // Обновляем отображение валюты
+                // Получаем ID пользователя из localStorage
+                const userId = localStorage.getItem('userId');
+                console.log('ID пользователя из localStorage:', userId); // Логируем ID пользователя
+
+                if (userId) {
+                    // Запрос на получение скина пользователя
+                    $.get('get_user_skin.php', { id: userId })
+                        .done(function(data) {
+                            try {
+                                const response = typeof data === 'string' ? JSON.parse(data) : data;
+                                if (response.status === 'success') {
+                                    const skinId = response.skin; // Получаем значение skin из ответа
+                                    let skinImage = skinId == 0 ? 'default_character.gif' : 'img' + skinId + '.gif'; // Определяем изображение скина
+
+                                    // Обновляем изображение персонажа
+                                    $('#character-container img').attr('src', skinImage);
+                                    $('.gif-container img').attr('src', skinImage); // Обновляем изображение скина
+                                    console.log('Скин установлен:', skinImage); // Логируем установленный скин
+                                } else {
+                                    console.error('Ошибка при получении скина:', response.message);
+                                    setDefaultSkin();
+                                }
+                            } catch (e) {
+                                console.error('Ошибка при обработке ответа:', e);
+                                setDefaultSkin();
+                            }
+                        })
+                        .fail(function(jqXHR, textStatus, errorThrown) {
+                            console.error('Ошибка при запросе:', textStatus, errorThrown);
+                            setDefaultSkin();
+                        });
+                } else {
+                    setDefaultSkin();
+                }
+
+                function setDefaultSkin() {
+                    $('#character-container img').attr('src', 'default_character.gif');
+                    $('.gif-container img').attr('src', 'default_character.gif');
+                    console.log('ID пользователя не найден, установлен по умолчанию.'); // Логируем установку по умолчанию
+                }
             });
 
         </script>
+        
     </body>
 </html>

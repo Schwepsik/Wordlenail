@@ -6,10 +6,12 @@ $username = 'u2845244_default'; // Логин от базы данных
 $password = 'nF0nM6wC1vmW2dH1'; // Пароль от базы данных
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
     // Устанавливаем режим обработки ошибок PDO
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->exec("set names utf8mb4");
 } catch (PDOException $e) {
+    
     die(json_encode(['error' => "Ошибка подключения: " . $e->getMessage()]));
 }
 

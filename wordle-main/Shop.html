@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Магазин скинов</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             font-family: sans-serif;
@@ -127,6 +128,21 @@
             width: 45px; /* Измените размер по необходимости */
             height: 45px; /* Измените размер по необходимости */
         }
+        .select-button {
+            background-color: #00a8e8; /* Синий цвет для кнопки "Выбрать" */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .select-button:disabled {
+            background-color: #b2e0f0; /* Светло-голубой цвет для кнопки "Выбрано" */
+            color: #666; /* Серый цвет текста для отключенной кнопки */
+            cursor: not-allowed; /* Указатель "недоступно" */
+        }
 
         #currency-count {
             margin-left: 5px; /* Отступ слева от изображения */
@@ -154,7 +170,8 @@
                             <img src="coin.png" class="coin-image" alt="Coin Image">
                         </div>
                     </div>
-                    <button class="buy-button">Купить</button>
+                    <button class="buy-button" data-skin-id="skin1" data-gif="img1.gif">Купить</button>
+                    <button class="select-button" data-skin-id="skin1">Выбрать</button>
                 </div>
             </div>
             <div class="item">
@@ -167,7 +184,8 @@
                             <img src="coin.png" class="coin-image" alt="Coin Image">
                         </div>
                     </div>
-                    <button class="buy-button">Купить</button>
+                    <button class="buy-button" data-skin-id="skin2" data-gif="img2.gif">Купить</button>
+                    <button class="select-button" data-skin-id="skin2">Выбрать</button>
                 </div>
             </div>
             <div class="item">
@@ -180,11 +198,12 @@
                             <img src="coin.png" class="coin-image" alt="Coin Image">
                         </div>
                     </div>
-                    <button class="buy-button">Купить</button>
+                    <button class="buy-button" data-skin-id="skin3" data-gif="img3.gif">Купить</button>
+                    <button class="select-button" data-skin-id="skin3">Выбрать</button>
                 </div>
             </div>
             <div class="item">
-                <img src="img1.gif" class="gid-image" alt="Скин 4">
+                <img src="img4.gif" class="gid-image" alt="Скин 4">
                 <div class="item-info">
                     <h2>Скин 4</h2>
                     <div class="price-container">
@@ -193,7 +212,8 @@
                             <img src="coin.png" class="coin-image" alt="Coin Image">
                         </div>
                     </div>
-                    <button class="buy-button">Купить</button>
+                    <button class="buy-button" data-skin-id="skin4" data-gif="img4.gif">Купить</button>
+                    <button class="select-button" data-skin-id="skin4">Выбрать</button>
                 </div>
             </div>
             <div class="item">
@@ -206,7 +226,8 @@
                             <img src="coin.png" class="coin-image" alt="Coin Image">
                         </div>
                     </div>
-                    <button class="buy-button">Купить</button>
+                    <button class="buy-button" data-skin-id="skin5" data-gif="img5.gif">Купить</button>
+                    <button class="select-button" data-skin-id="skin5">Выбрать</button>
                 </div>
             </div>
             <div class="item">
@@ -219,49 +240,135 @@
                             <img src="coin.png" class="coin-image" alt="Coin Image">
                         </div>
                     </div>
-                    <button class="buy-button">Купить</button>
+                    <button class="buy-button" data-skin-id="skin6" data-gif="img6.gif">Купить</button>
+                    <button class="select-button" data-skin-id="skin6">Выбрать</button>
                 </div>
             </div>
         </div>
     </div>
 </body>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="script.js"></script>
+
 <script>
     $(document).ready(() => {
-            // Получаем валюту из localStorage
-            let currency = parseInt(localStorage.getItem('currency')) || 0;
-            $('#currency-count').text(currency); // Обновляем отображение валюты
+    // Получаем валюту из localStorage
+    const currency = parseInt(localStorage.getItem('currency')) || 2000; // Устанавливаем 2000 по умолчанию
+    $('#currency-count').text(currency); // Обновляем отображение валюты
 
-            // Обработчик события для кнопок "Купить"
-            $('.buy-button').click(function() {
-                const itemPrice = parseInt($(this).siblings('.price').text());
-                const itemGif = $(this).closest('.item').find('.gid-image').attr('src');
-                const skinId = $(this).data('skin-id'); // Получаем идентификатор скина
+    // Получаем ID пользователя из localStorage
+    const userId = localStorage.getItem('userId');
+    console.log('ID пользователя из localStorage:', userId); // Логируем ID пользователя
 
-                console.log('Текущая валюта:', currency); // Отладочное сообщение
-                console.log('Цена скина:', itemPrice); // Отладочное сообщение
+    if (userId) {
+        // Запрос на получение скина пользователя
+        $.get('get_user_skin.php', { id: userId })
+            .done(function(data) {
+                try {
+                    const response = typeof data === 'string' ? JSON.parse(data) : data;
+                    console.log('Ответ от get_user_skin.php:', response); // Логируем ответ
+                    if (response.status === 'success') {
+                        const skinId = response.skin; // Получаем значение skin из ответа
+                        let skinImage = skinId == 0 ? 'default_character.gif' : 'skin' + skinId + '.gif'; // Определяем изображение скина
 
-                if (currency >= itemPrice) {
-                    currency -= itemPrice; // Списываем валюту
-                    localStorage.setItem('currency', currency); // Сохраняем обновленное значение валюты
-                    $('#currency-count').text(currency); // Обновляем отображение валюты
+                        // Обновляем изображение персонажа
+                        $('#character-container img').attr('src', skinImage);
+                        $('.gif-container img').attr('src', skinImage); // Обновляем изображение скина
+                        console.log('Скин установлен:', skinImage); // Логируем установленный скин
 
-                    // Сохраняем купленный скин в localStorage
-                    let purchasedSkins = JSON.parse(localStorage.getItem('purchasedSkins')) || {};
-                    purchasedSkins[skinId] = true;
-                    localStorage.setItem('purchasedSkins', JSON.stringify(purchasedSkins));
+                        // Проверяем статусы купленных скинов
+                        const ownedSkins = {
+                            skin1: response.skin1,
+                            skin2: response.skin2,
+                            skin3: response.skin3,
+                            skin4: response.skin4,
+                            skin5: response.skin5,
+                            skin6: response.skin6
+                        };
+                        console.log('Статусы купленных скинов:', ownedSkins); // Логируем статусы купленных скинов
 
-                    // Вызываем функцию для обновления скина персонажа на index.html
-                    updateCharacterSkin(itemGif); 
+                        // Обновляем состояние кнопок "Купить" и "Выбрать"
+                        $('.item').each(function() {
+                            const currentSkinId = $(this).find('.buy-button').data('skin-id'); // Получаем skinId
+                            console.log('Проверяем skinId:', currentSkinId); // Логируем skinId
 
-                    alert('Скин куплен!'); // Уведомление о покупке
-                } else {
-                    alert('Недостаточно валюты для покупки!'); // Уведомление о недостатке валюты
+                            if (ownedSkins[currentSkinId] === 1) { // Проверяем, куплен ли скин
+                                $(this).find('.buy-button').hide(); // Скрываем кнопку "Купить"
+
+                                if (currentSkinId === 'skin' + skinId) { // Проверяем, является ли скин текущим
+                                    $(this).find('.select-button').text('Выбрано').attr('disabled', true); // Деактивируем кнопку "Выбрать"
+                                } else {
+                                    $(this).find('.select-button').removeAttr('disabled'); // Активируем кнопку "Выбрать" для других скинов
+                                }
+                            } else {
+                                $(this).find('.select-button').hide(); // Скрываем кнопку "Выбрать", если скин не куплен
+                            }
+                        });
+
+                        // Обработчик для кнопки "Выбрать"
+                        $('.select-button').on('click', function() {
+                            const selectedSkinId = $(this).data('skin-id').replace('skin', ''); // Получаем только номер скина
+                            console.log('Выбранный скин:', selectedSkinId); // Логируем выбранный скин
+
+                            // Отправляем запрос на изменение скина
+                            $.post('set_user_skin.php', { id: userId, skin: selectedSkinId }) // Передаем только номер скина
+                                .done(function(response) {
+                                    try {
+                                        const result = typeof response === 'string' ? JSON.parse(response) : response;
+                                        if (result.status === 'success') {
+                                            // Обновляем изображение персонажа
+                                            $('#character-container img').attr('src', 'skin' + selectedSkinId + '.gif');
+                                            $('.gif-container img').attr('src', 'skin' + selectedSkinId + '.gif');
+
+                                                                                        // Обновляем состояние кнопок
+                                            $('.item').each(function() {
+                                                const skinId = $(this).find('.buy-button').data('skin-id'); // Получаем skinId
+                                                if (skinId === 'skin' + selectedSkinId) {
+                                                    $(this).find('.select-button').text('Выбрано').attr('disabled', true); // Деактивируем кнопку "Выбрать"
+                                                } else {
+                                                    $(this).find('.select-button').text('Выбрать').removeAttr('disabled'); // Активируем кнопку "Выбрать" для других скинов
+                                                }
+                                            });
+                                            console.log('Скин успешно изменен на:', selectedSkinId);
+                                        } else {
+                                            console.error('Ошибка при изменении скина:', result.message);
+                                        }
+                                    } catch (e) {
+                                        console.error('Ошибка при обработке ответа:', e);
+                                    }
+                                })
+                                .fail(function(jqXHR, textStatus, errorThrown) {
+                                    console.error('Ошибка при запросе изменения скина:', textStatus, errorThrown);
+                                });
+                        });
+
+                    } else {
+                        console.error('Ошибка при получении скина:', response.message);
+                        setDefaultSkin();
+                    }
+                } catch (e) {
+                    console.error('Ошибка при обработке ответа:', e);
+                    setDefaultSkin();
                 }
+            })
+            .fail(function(jqXHR, textStatus, errorThrown) {
+                console.error('Ошибка при запросе:', textStatus, errorThrown);
+                setDefaultSkin();
             });
-        });
+
+    } else {
+        setDefaultSkin();
+    }
+
+    function setDefaultSkin() {
+        $('#character-container img').attr('src', 'default_character.gif');
+        $('.gif-container img').attr('src', 'default_character.gif');
+        console.log('ID пользователя не найден, установлен по умолчанию.'); // Логируем установку по умолчанию
+    }
+});
+
 </script>
-<script src="index.js"></script>
+
 
 
 </html>
