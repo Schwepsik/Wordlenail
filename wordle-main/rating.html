@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Rating Table</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #77c7f3, #a0d1f5); /* Голубой градиент */
+            color: #333;
+        }
+
+        h1 {
+            padding-top:50px;
+            color: #fff;
+            text-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            font-size: 3em;
+            text-align: center;
+        }
+
+        table {
+            width: 80%;
+            max-width: 600px;
+            border-collapse: collapse;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            background-color: rgba(255, 255, 255, 0.9); /* Полупрозрачный белый фон */
+            border-radius: 10px;
+            overflow: hidden; /* Скрывает лишние элементы */
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #eee;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        td {
+            border-bottom: 1px solid #ddd;
+        }
+
+        td:first-child {
+            text-align: center;
+            width: 50px; /* Ширина столбца ранга */
+        }
+
+        /* Медали */
+        tr:nth-child(1) td:first-child::before {
+            content: "🥇"; /* Золотая медаль */
+            margin-right: 5px;
+            font-size: 2em;
+        }
+
+        tr:nth-child(2) td:first-child::before {
+            content: "🥈"; /* Серебряная медаль */
+            margin-right: 5px;
+            font-size: 2em;
+        }
+
+        tr:nth-child(3) td:first-child::before {
+            content: "🥉"; /* Бронзовая медаль */
+            margin-right: 5px;
+            font-size: 2em;
+        }
+        .back-button {
+            position: fixed; /* Фиксированное позиционирование */
+            top: 10px; /* Отступ сверху */
+            left: 10px; /* Отступ слева */
+            padding: 0; /* Убираем поля вокруг изображения */
+            background-color: transparent; /* Прозрачный фон */
+            border: none; /* Без границ */
+            cursor: pointer; /* Курсор указателя */
+        }
+
+        .back-button img {
+            width: 100px; /* Ширина изображения */
+            height: 50px; /* Высота изображения */
+        }
+        /* Новый CSS для высоты строк */
+        #ratingTable tbody tr { /* Все строки в теле таблицы */
+            height: 40px; /* Задайте желаемую высоту */
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-button"> <img src="button.png"></a> 
+    <h1>User Ratings</h1>
+    <table id="ratingTable">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>User</th>
+                <th>Rating</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Здесь будут добавляться строки с рейтингами пользователей -->
+        </tbody>
+    </table>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Запрос данных с /rating.php
+            $.ajax({
+                url: '/rating.php',
+                method: 'GET',
+                dataType: 'json', // Ожидаем данные в формате JSON
+                success: function(data) {
+                    var tableBody = $('#ratingTable tbody');
+                    tableBody.empty(); // Очищаем таблицу перед добавлением новых данных
+
+                    // Проходимся по полученным данным и добавляем строки в таблицу
+                    $.each(data.ranking, function(index, user) {
+                        var row = $('<tr></tr>');
+                        // Добавляем пустую ячейку для ранга ВСЕГДА
+                        row.append('<td></td>'); 
+                        row.append('<td>' + user.name + '</td>');    // Имя пользователя
+                        row.append('<td>' + user.score + '</td>');  // Рейтинг пользователя
+                        tableBody.append(row);
+                    });
+
+                    // Заполняем ячейки ранга для позиций после первых трех
+                    $('#ratingTable tbody tr').each(function(index) {
+                        if (index >= 3) {
+                            $(this).find('td:first-child').text(index + 1); // Заполняем рангом
+                        }
+                    });
+                },
+                error: function() {
+                    console.log('Error loading user ratings.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магазин скинов</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            /* Применяем градиент ко всему фону */
+            background: linear-gradient(to right, #00c698, #00a8e8);
+            margin: 0;
+            padding: 0;
+            display: flex; /* Делаем body блоком flex */
+            flex-direction: column; /* Выравниваем по вертикали */
+            align-items: center; /* Выравниваем по центру по горизонтали */
+            min-height: 100vh; /* Занимаем всю высоту экрана */
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            /* Выравнивание заголовка по центру */
+            text-align: center; 
+        }
+
+        .store-items {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            /* Изменяем направление flex-контейнера */
+            flex-direction: row;
+            align-items: stretch; 
+        }
+
+        .item {
+            width: 48%; 
+            margin-bottom: 20px;
+            text-align: center;
+            min-height: 250px; 
+            background: linear-gradient(to right, #e0ffff, #cceeff); /* Градиент */
+            border-radius: 8px; 
+        }
+
+        .gid-image {
+            max-width: 100px;
+            max-height: 100px;
+            min-width: 100px;
+            min-height: 100px;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .item-info {
+            margin-top: 10px;
+            vertical-align: middle; /* Добавлено */
+        }
+
+        .price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .coin-container {
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 5px;
+        }
+        .coin-image {
+            max-width: 25px;
+            max-height: 25px; 
+        }
+        .price{
+            font-size: 20px;
+        }
+        .buy-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* Кнопка "Назад" */
+        .back-button {
+            position: fixed;
+            top: 20px;  
+            left: 20px;
+            background-color: #fff;
+            color: #00a8e8;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Отступ для заголовка */
+        .container h1 {
+            margin-top: 60px; 
+        } 
+
+        .item-info h2 {
+            margin-bottom: 5px; 
+        }
+        .price-container {
+            display: flex;
+            align-items: center; /* Выравнивание по вертикали */
+            justify-content: center; /* Выравнивание по горизонтали */
+            margin-top: 10px; /* Отступ сверху */
+        }
+        .top-currency {
+            position: fixed; /* Фиксированное позиционирование */
+            top: 15px; /* Отступ сверху */
+            right: 150px; /* Отступ справа */
+            display: flex; /* Для выравнивания изображения и текста */
+            align-items: center; /* Вертикальное выравнивание по центру */
+            justify-content: center; /* Горизонтальное выравнивание по центру */
+        }
+
+        #currency-image {
+            width: 45px; /* Измените размер по необходимости */
+            height: 45px; /* Измените размер по необходимости */
+        }
+
+        #currency-count {
+            margin-left: 5px; /* Отступ слева от изображения */
+            font-size: 18px; /* Размер шрифта */
+            font-weight: bold; /* Жирный шрифт */
+        }
+
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">Назад</a>
+    <div class="top-currency"> 
+        <img src="coin.png" alt="Валюта" id="currency-image">
+        <span id="currency-count">0</span> </div>
+    <div class="container">
+        <h1>Магазин скинов</h1>
+        <div class="store-items">
+            <div class="item">
+                <img src="img1.gif" class="gid-image" alt="Скин 1">
+                <div class="item-info">
+                    <h2>Скин 1</h2>
+                    <div class="price-container">
+                        <p class="price">1500</p>
+                        <div class="coin-container">
+                            <img src="coin.png" class="coin-image" alt="Coin Image">
+                        </div>
+                    </div>
+                    <button class="buy-button" data-skin-id="skin1" data-gif="img1.gif">Купить</button>
+                </div>
+            </div>
+            <div class="item">
+                <img src="img2.gif" class="gid-image" alt="Скин 2">
+                <div class="item-info">
+                    <h2>Скин 2</h2>
+                    <div class="price-container">
+                        <p class="price">2000</p>
+                        <div class="coin-container">
+                            <img src="coin.png" class="coin-image" alt="Coin Image">
+                        </div>
+                    </div>
+                    <button class="buy-button" data-skin-id="skin2" data-gif="img2.gif">Купить</button>
+                </div>
+            </div>
+            <div class="item">
+                <img src="img3.gif" class="gid-image" alt="Скин 3">
+                <div class="item-info">
+                    <h2>Скин 3</h2>
+                    <div class="price-container">
+                        <p class="price">2500</p>
+                        <div class="coin-container">
+                            <img src="coin.png" class="coin-image" alt="Coin Image">
+                        </div>
+                    </div>
+                    <button class="buy-button" data-skin-id="skin3" data-gif="img3.gif">Купить</button>
+                </div>
+            </div>
+            <div class="item">
+                <img src="img4.gif" class="gid-image" alt="Скин 4">
+                <div class="item-info">
+                    <h2>Скин 4</h2>
+                    <div class="price-container">
+                        <p class="price">3000</p>
+                        <div class="coin-container">
+                            <img src="coin.png" class="coin-image" alt="Coin Image">
+                        </div>
+                    </div>
+                    <button class="buy-button" data-skin-id="skin4" data-gif="img4.gif">Купить</button>
+                </div>
+            </div>
+            <div class="item">
+                <img src="img5.gif" class="gid-image" alt="Скин 5">
+                <div class="item-info">
+                    <h2>Скин 5</h2>
+                    <div class="price-container">
+                        <p class="price">3500</p>
+                        <div class="coin-container">
+                            <img src="coin.png" class="coin-image" alt="Coin Image">
+                        </div>
+                    </div>
+                    <button class="buy-button" data-skin-id="skin5" data-gif="img5.gif">Купить</button>
+                </div>
+            </div>
+            <div class="item">
+                <img src="img6.gif" class="gid-image" alt="Скин 6">
+                <div class="item-info">
+                    <h2>Скин 6</h2>
+                    <div class="price-container">
+                        <p class="price">4000</p>
+                        <div class="coin-container">
+                            <img src="coin.png" class="coin-image" alt="Coin Image">
+                        </div>
+                    </div>
+                    <button class="buy-button" data-skin-id="skin6" data-gif="img6.gif">Купить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="script.js"></script>
+
+<script>
+    $(document).ready(() => {
+        // Получаем валюту из localStorage
+        const currency = parseInt(localStorage.getItem('currency')) || 2000; // Устанавливаем 2000 по умолчанию
+        $('#currency-count').text(currency); // Обновляем отображение валюты
+    
+        // Получаем ID пользователя из localStorage
+        const userId = localStorage.getItem('userId');
+        console.log('ID пользователя из localStorage:', userId); // Логируем ID пользователя
+    
+        if (userId) {
+            // Запрос на получение скина пользователя
+            $.get('get_user_skin.php', { id: userId })
+                .done(function(data) {
+                    try {
+                        const response = typeof data === 'string' ? JSON.parse(data) : data;
+                        console.log('Ответ от get_user_skin.php:', response); // Логируем ответ
+                        if (response.status === 'success') {
+                            const skinId = response.skin; // Получаем значение skin из ответа
+                            let skinImage = skinId == 0 ? 'default_character.gif' : 'skin' + skinId + '.gif'; // Определяем изображение скина
+    
+                            // Обновляем изображение персонажа
+                            $('#character-container img').attr('src', skinImage);
+                            $('.gif-container img').attr('src', skinImage); // Обновляем изображение скина
+                            console.log('Скин установлен:', skinImage); // Логируем установленный скин
+    
+                            // Проверяем статусы купленных скинов
+                            const ownedSkins = {
+                                skin1: response.skin1,
+                                skin2: response.skin2,
+                                skin3: response.skin3,
+                                skin4: response.skin4,
+                                skin5: response.skin5,
+                                skin6: response.skin6
+                            };
+                            console.log('Статусы купленных скинов:', ownedSkins); // Логируем статусы купленных скинов
+    
+                            // Обновляем состояние кнопок "Купить"
+                            $('.item').each(function() {
+                                const skinId = $(this).find('.buy-button').data('skin-id'); // Получаем skinId
+                                console.log('Проверяем skinId:', skinId); // Логируем skinId
+                                if (ownedSkins[skinId] === 1) { // Проверяем, куплен ли скин
+                                    $(this).find('.buy-button').text('Куплено').attr('disabled', true); // Деактивируем кнопку
+                                    console.log('Кнопка деактивирована для skinId:', skinId); // Логируем деактивацию
+                                }
+                            });
+                        } else {
+                            console.error('Ошибка при получении скина:', response.message);
+                            setDefaultSkin();
+                        }
+                    } catch (e) {
+                        console.error('Ошибка при обработке ответа:', e);
+                        setDefaultSkin();
+                    }
+                })
+                .fail(function(jqXHR, textStatus, errorThrown) {
+                    console.error('Ошибка при запросе:', textStatus, errorThrown);
+                    setDefaultSkin();
+                });
+    
+        } else {
+            setDefaultSkin();
+        }
+    
+        function setDefaultSkin() {
+            $('#character-container img').attr('src', 'default_character.gif');
+            $('.gif-container img').attr('src', 'default_character.gif');
+            console.log('ID пользователя не найден, установлен по умолчанию.'); // Логируем установку по умолчанию
+        }
+    });
+    </script>
+    
+
+
+</html>
