@@ -81,6 +81,7 @@ $('.buy-button').click(function() {
 
 
 $(document).ready(() => {
+<<<<<<< Updated upstream
   localStorage.removeItem('purchasedSkins');
   localStorage.removeItem('currency'); // Если нужно
   const wordList = ['frank', 'fraud', 'freak', 'freed', 'freer', 'fresh', 'friar', 'fried', 'frill', 'frisk', 'fritz', 'frock', 'frond', 'front', 'frost', 'froth'];
@@ -164,12 +165,18 @@ $(document).ready(() => {
 
 
     // Функция для установки нового слова
+=======
+
+    const wordList = ['frank', 'fraud', 'freak', 'freed', 'freer', 'fresh', 'friar', 'fried', 'frill', 'frisk', 'fritz', 'frock', 'frond', 'front', 'frost', 'froth']
+    let word = 'Hello'
+>>>>>>> Stashed changes
     function setGameWord() {
-      let randomNum = Math.floor(Math.random() * 16);
-      word = wordList[randomNum].toUpperCase();
-      console.log(word);
-      return word;
+        let randomNum = Math.floor(Math.random() * 16)
+        word = wordList[randomNum].toUpperCase()
+        console.log(word)
+        return word
     }
+<<<<<<< Updated upstream
     
     function parseInitData (initData) {
       const params = new URLSearchParams(initData);
@@ -260,16 +267,85 @@ $(document).ready(() => {
       // Цикл по 5 полям ввода, начиная с ⓃstartⓃ
       for (var i = start; i <= index; i++) {
         // Получаем текущий символ из слова
+=======
+    setGameWord();
+    let correctWords = 0;
+    let gameCompleted = false;
+
+    $('#correct-words').text(correctWords);
+    $('input').attr('disabled', true);
+    $('input').eq(0).attr('disabled', false);
+
+    $('input').keyup(function () {
+        let value = $(this).val().trim();
+        let index = $('input').index(this);
+        let prev = index - 1;
+        let next = index + 1;
+
+        if (value != '') {
+            if (index != 0 && $('input').eq(prev).val() == '') {
+                $(this).val('');
+            } else {
+                $('input').attr('disabled', true);
+                // $(this).attr('disabled', false);
+                $('input').eq(next).attr('disabled', false);
+                $('input').eq(next).focus();
+
+                if (index != 0 && next % 5 == 0) {
+                    $('input').eq(next).attr('disabled', true);
+                    correctWords += check(word, index);
+
+                }
+            }
+        } else {
+            if (index != 0 && !$('input').eq(prev).hasClass('prevent')) {
+                $('input').attr('disabled', true);
+                $('input').eq(prev).attr('disabled', false);
+                $('input').eq(prev).focus();
+                $('input').eq(next).val('');
+
+            } else {
+                $('input').attr('disabled', true);
+                $('input').eq(next).val('');
+                $(this).attr('disabled', false);
+            }
+        }
+
+        console.log('Number of correct guesses: ' + correctWords);
+
+    });
+
+
+});
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function check(word, index) {
+    word = word.toLowerCase();
+    let start = index - 4;
+    let check = '';
+    let counter = 0;
+    let correctWord = 1;
+
+    for (var i = start; i <= index; i++) {
+>>>>>>> Stashed changes
         char = word[counter];
         // Получаем введенный символ из поля ввода
         char_check = $('input').eq(i).val().toLowerCase();
+<<<<<<< Updated upstream
     
         // Делаем поле ввода недоступным и добавляем классы для анимации
+=======
+
+>>>>>>> Stashed changes
         $('input').eq(i).attr('disabled', 'disabled');
         $('input').eq(i).addClass('prevent');
         $('input').eq(i).addClass('flip');
         // Пауза в 500 мс для анимации
         await sleep(500);
+<<<<<<< Updated upstream
     
         // Проверяем, совпадает ли введенный символ с символом из слова
         if (char == char_check) {
@@ -288,9 +364,25 @@ $(document).ready(() => {
           }
         }
         // Добавляем введенный символ к строке ⓃcheckⓃ
+=======
+
+        if (char == char_check) {
+            $('input').eq(i).addClass('correct');
+        } else {
+            if (word.includes(char_check)) {
+                $('input').eq(i).addClass('includes');
+            } else {
+                $('input').eq(i).addClass('incorrect');
+                correctWord = 0;
+            }
+
+        }
+
+>>>>>>> Stashed changes
         check = check + char_check;
         // Увеличиваем счетчик символов
         counter++;
+<<<<<<< Updated upstream
       }
       // Если ⓃcheckⓃ совпадает со словом
       if (check == word) {
@@ -311,12 +403,24 @@ $(document).ready(() => {
       }else {
         // Если слово не верно, делаем следующее поле доступным
         // и перемещаем фокус на него
+=======
+
+    }
+
+
+    if (check == word) {
+        $('input').attr('disabled', 'disabled');
+        correctWords += 1;
+        // alert('Correct!');
+        return correctWords;
+    } else {
+>>>>>>> Stashed changes
         $('input').eq(index + 1).attr('disabled', false);
         $('input').eq(index + 1).focus();
         // Возвращаем 0, так как слово не верно
         return correctWord;
-      }
     }
+<<<<<<< Updated upstream
     //обработчик событий
     $('input').keyup(function () {
       // Получаем текущее значение поля ввода, обрезаем пробелы
@@ -397,4 +501,6 @@ updateCurrency(); // Обновляем отображение валюты
 // Функция задержки (для анимации)
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+=======
+>>>>>>> Stashed changes
 }

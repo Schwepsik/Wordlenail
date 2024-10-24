@@ -6,9 +6,14 @@
 }
 
 body{
+<<<<<<< Updated upstream
     width: 100%;
     background: linear-gradient(to right, #e0ffff, #cceeff, #aaccff, #80bfff);
     overflow: hidden;
+=======
+    background-image: url(background.jpg);
+    background-size: cover;
+>>>>>>> Stashed changes
 }
 header {
     
