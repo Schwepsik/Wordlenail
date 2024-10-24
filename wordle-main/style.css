@@ -6,14 +6,9 @@
 }
 
 body{
-<<<<<<< Updated upstream
     width: 100%;
     background: linear-gradient(to right, #e0ffff, #cceeff, #aaccff, #80bfff);
     overflow: hidden;
-=======
-    background-image: url(background.jpg);
-    background-size: cover;
->>>>>>> Stashed changes
 }
 header {
     
@@ -189,6 +184,8 @@ input {
     font-size: 18px; /* Размер шрифта */
     font-weight: bold; /* Жирный шрифт */
 }
+
+
 .top-right {
     position:
     fixed; /* Фиксируем позицию */

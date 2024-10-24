@@ -3,13 +3,9 @@
     <head>
         <meta charset="utf-8">
         <link href="style.css" rel="stylesheet">
-<<<<<<< Updated upstream
         <title></title>
         <script src="https://telegram.org/js/telegram-web-app.js"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-=======
-        <title>Wordle</title>
->>>>>>> Stashed changes
     </head>
     
     <body>
@@ -29,7 +25,11 @@
             <img src="coin.png" alt="Валюта" id="currency-image">
             <span id="currency-count">0</span> </div>
         <div class="gif-container" id="character-container">
+<<<<<<< Updated upstream
             <img src="default_character.gif" alt="Персонаж" id="character-image">
+=======
+            <img src="anim.gif" alt="Персонаж" id="character-image">
+>>>>>>> Stashed changes
         </div>
         <div class="top-left">
                 <button onclick="window.location.href='rating.html'">
@@ -37,6 +37,8 @@
                 <span>Рейтинг</span> 
             </button>
         </div>
+        
+        
         <div class="top-right">
             <button onclick="window.location.href='Shop.html'">
             <img src="shop.png" alt="Магазин" id="shop-image">
@@ -90,7 +92,6 @@
                 </tr>
             </table>
         </div>
-<<<<<<< Updated upstream
         <div>
             <p id="total-words-count-label" class="words"></p>
         <div id="modal" class="modal">
@@ -123,6 +124,7 @@
         </script>
         <script>
             $(document).ready(() => {
+<<<<<<< Updated upstream
                 // Получаем валюту из localStorage
                 const currency = parseInt(localStorage.getItem('currency')) || 2000; // Устанавливаем 2000 по умолчанию
                 $('#currency-count').text(currency); // Обновляем отображение валюты
@@ -167,15 +169,22 @@
                     $('.gif-container img').attr('src', 'default_character.gif');
                     console.log('ID пользователя не найден, установлен по умолчанию.'); // Логируем установку по умолчанию
                 }
+=======
+            // Получаем выбранный скин из localStorage
+            // Обновление скина персонажа при загрузке страницы
+            const selectedSkin = localStorage.getItem('selectedSkin');
+            if (selectedSkin) {
+            $('#character-container img').attr('src', selectedSkin); // Обновляем изображение персонажа
+                $('.gif-container img').attr('src', selectedSkin); // Обновляем изображение скина
+            }
+            
+            // Получаем валюту из localStorage
+            const currency = parseInt(localStorage.getItem('currency')) || 0;
+            $('#currency-count').text(currency); // Обновляем отображение валюты
+>>>>>>> Stashed changes
             });
 
         </script>
         
-=======
-
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="script.js"></script>
-
->>>>>>> Stashed changes
     </body>
 </html>
