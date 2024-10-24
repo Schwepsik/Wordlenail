@@ -170,8 +170,12 @@
                             <img src="coin.png" class="coin-image" alt="Coin Image">
                         </div>
                     </div>
+<<<<<<< Updated upstream
                     <button class="buy-button" data-skin-id="skin1" data-gif="img1.gif">Купить</button>
                     <button class="select-button" data-skin-id="skin1">Выбрать</button>
+=======
+                    <button class="buy-button" data-skin-id="skin1">Купить</button>
+>>>>>>> Stashed changes
                 </div>
             </div>
             <div class="item">
@@ -184,8 +188,12 @@
                             <img src="coin.png" class="coin-image" alt="Coin Image">
                         </div>
                     </div>
+<<<<<<< Updated upstream
                     <button class="buy-button" data-skin-id="skin2" data-gif="img2.gif">Купить</button>
                     <button class="select-button" data-skin-id="skin2">Выбрать</button>
+=======
+                    <button class="buy-button" data-skin-id="skin2">Купить</button>
+>>>>>>> Stashed changes
                 </div>
             </div>
             <div class="item">
@@ -198,8 +206,12 @@
                             <img src="coin.png" class="coin-image" alt="Coin Image">
                         </div>
                     </div>
+<<<<<<< Updated upstream
                     <button class="buy-button" data-skin-id="skin3" data-gif="img3.gif">Купить</button>
                     <button class="select-button" data-skin-id="skin3">Выбрать</button>
+=======
+                    <button class="buy-button" data-skin-id="skin3">Купить</button>
+>>>>>>> Stashed changes
                 </div>
             </div>
             <div class="item">
@@ -212,8 +224,12 @@
                             <img src="coin.png" class="coin-image" alt="Coin Image">
                         </div>
                     </div>
+<<<<<<< Updated upstream
                     <button class="buy-button" data-skin-id="skin4" data-gif="img4.gif">Купить</button>
                     <button class="select-button" data-skin-id="skin4">Выбрать</button>
+=======
+                    <button class="buy-button" data-skin-id="skin4">Купить</button>
+>>>>>>> Stashed changes
                 </div>
             </div>
             <div class="item">
@@ -226,8 +242,12 @@
                             <img src="coin.png" class="coin-image" alt="Coin Image">
                         </div>
                     </div>
+<<<<<<< Updated upstream
                     <button class="buy-button" data-skin-id="skin5" data-gif="img5.gif">Купить</button>
                     <button class="select-button" data-skin-id="skin5">Выбрать</button>
+=======
+                    <button class="buy-button" data-skin-id="skin6">Купить</button>
+>>>>>>> Stashed changes
                 </div>
             </div>
             <div class="item">
@@ -240,8 +260,12 @@
                             <img src="coin.png" class="coin-image" alt="Coin Image">
                         </div>
                     </div>
+<<<<<<< Updated upstream
                     <button class="buy-button" data-skin-id="skin6" data-gif="img6.gif">Купить</button>
                     <button class="select-button" data-skin-id="skin6">Выбрать</button>
+=======
+                    <button class="buy-button" data-skin-id="skin6">Купить</button>
+>>>>>>> Stashed changes
                 </div>
             </div>
         </div>
@@ -252,6 +276,7 @@
 
 <script>
     $(document).ready(() => {
+<<<<<<< Updated upstream
     // Получаем валюту из localStorage
     const currency = parseInt(localStorage.getItem('currency')) || 2000; // Устанавливаем 2000 по умолчанию
     $('#currency-count').text(currency); // Обновляем отображение валюты
@@ -369,6 +394,60 @@
 
 </script>
 
+=======
+        // Получаем валюту из localStorage
+        let currency = parseInt(localStorage.getItem('currency')) || 0;
+        $('#currency-count').text(currency); // Обновляем отображение валюты
+
+        // Обработчик события для кнопок "Купить"
+        $('.buy-button').click(function() {
+            const itemPrice = parseInt($(this).siblings('.price').text());
+            const itemGif = $(this).closest('.item').find('.gid-image').attr('src');
+            const skinId = $(this).data('skin-id'); // Получаем идентификатор скина
+
+            console.log('Текущая валюта:', currency); // Отладочное сообщение
+            console.log('Цена скина:', itemPrice); // Отладочное сообщение
+
+            if (currency >= itemPrice) {
+                currency -= itemPrice; // Списываем валюту
+                localStorage.setItem('currency', currency); // Сохраняем обновленное значение валюты
+                $('#currency-count').text(currency); // Обновляем отображение валюты
+
+                // Сохраняем купленный скин в localStorage
+                let purchasedSkins = JSON.parse(localStorage.getItem('purchasedSkins')) || {};
+                purchasedSkins[skinId] = true; // Помечаем скин как купленный
+                localStorage.setItem('purchasedSkins', JSON.stringify(purchasedSkins));
+
+                // Вызываем функцию для обновления скина персонажа на index.html
+                updateCharacterSkin(itemGif); 
+
+                alert('Скин куплен!'); // Уведомление о покупке
+            } else {
+                alert('Недостаточно валюты для покупки!'); // Уведомление о недостатке валюты
+            }
+        });
+
+        // Проверка на наличие купленных скинов
+        let purchasedSkins = JSON.parse(localStorage.getItem('purchasedSkins')) || {};
+        $('.item').each(function() {
+            const skinId = $(this).find('.buy-button').data('skin-id');
+            if (purchasedSkins[skinId]) {
+                $(this).find('.buy-button').text('Куплено').attr('disabled', true); // Деактивируем кнопку
+            }
+        });
+    });
+
+    // Функция обновления скина персонажа
+    function updateCharacterSkin(skin) {
+        // Сохраняем выбранный скин в localStorage
+        localStorage.setItem('selectedSkin', skin);
+        // Обновляем изображение персонажа на главной странице
+        $('#character-container img').attr('src', skin);
+    }
+</script>
+
+<script src="index.js"></script>
+>>>>>>> Stashed changes
 
 
 </html>

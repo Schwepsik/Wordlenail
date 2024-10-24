@@ -1,4 +1,5 @@
 let currency = 0; // Переместите эту строку сюда, чтобы она была доступна глобально
+<<<<<<< Updated upstream
 let userId; // Объявляем переменную userId в глобальной области видимости
 let skinId; // Объявляем переменную skinId в глобальной области видимости
 let currentSlot = 0; // Текущий слот
@@ -8,6 +9,14 @@ const totalSlots = 7; // Общее количество слотов
 let claimedRewards = []; // Массив для хранения состояния наград
 
 // Загружаем состояние наград из localStorage при инициализации
+=======
+
+// Функция обновления валюты
+function updateCurrency() {
+    $('#currency-count').text(currency);
+    localStorage.setItem('currency', currency);
+}
+>>>>>>> Stashed changes
 $(document).ready(() => {
   const userId = localStorage.getItem('userId');
   if (!userId || !isUserInDatabase(userId)) { // Предполагается, что у вас есть функция isUserInDatabase
@@ -196,6 +205,7 @@ $(document).ready(() => {
   let attempts = 0; 
   let gameCompleted = false;
   const tg = window.Telegram.WebApp;
+<<<<<<< Updated upstream
   function updateCharacterSkinFromLocalStorage() {
     const selectedSkin = localStorage.getItem('selectedSkin');
     if (selectedSkin) {
@@ -251,17 +261,44 @@ $(document).ready(() => {
     $('#currency-count').text(currency); 
   });
 
+=======
+
+  // Функция обновления скина персонажа
+  function updateCharacterSkin() {
+    // Получаем информацию о выбранном скине из localStorage
+    let selectedSkin = localStorage.getItem('selectedSkin');
+    // Получаем информацию о купленных скинах из localStorage
+    let purchasedSkins = JSON.parse(localStorage.getItem('purchasedSkins')) || {};
+    if (selectedSkin && purchasedSkins[selectedSkin]) {
+      $('#character-container img').attr('src', selectedSkin);
+    } else {
+      // Используйте стандартный скин, если скин не куплен
+      $('#character-container img').attr('src', 'default_character.gif'); 
+    }
+  }
+  // Получите информацию о выбранном скине из localStorage
+  let selectedSkin = localStorage.getItem('selectedSkin');
+  if (selectedSkin) {
+    updateCharacterSkin(selectedSkin);
+  }
+>>>>>>> Stashed changes
   function getScore(id, name) {
     $.get('/score.php', { id: id, name: name }, function(data) {
         console.log(data); // Выводим все данные, полученные от сервера
         if (data.status === 'success' && typeof data.score === 'number' && typeof data.money === 'number') {
             correctWords = data.score;
+<<<<<<< Updated upstream
             currency = data.money; 
             $('#total-words-count-label').text('Верно угаданных слов: ' + correctWords);
             updateCurrency(); // Обновляем отображение валюты
 
             // Сохраняем userId в localStorage
             localStorage.setItem('userId', id);
+=======
+            currency = data.money; // Устанавливаем валюту из ответа сервера
+            $('#total-words-count-label').text('Верно угаданных слов: ' + correctWords);
+            updateCurrency(); // Обновляем отображение валюты
+>>>>>>> Stashed changes
         } else {
             console.log('Ошибка: неверный ответ от сервера', data);
         }
@@ -270,7 +307,10 @@ $(document).ready(() => {
     });
   }
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
     // Функция для установки нового слова
     function setGameWord() {
       let randomNum = Math.floor(Math.random() * 16);
